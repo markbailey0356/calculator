@@ -1,0 +1,65 @@
+* {margin: 0; padding: 0;}
+
+.calculator {
+  width: 200px;
+  height: 250px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.display-frame {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  background-color: #222;
+}
+
+.display {
+  flex: 1;
+  text-align: right;
+  font-size: 20px;
+  font-family: 'Share Tech Mono', monospace;
+  color: rgb(21, 255, 0);
+  margin-right: 0.5em;
+}
+
+.buttons {
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  grid-template-areas: 
+    "clear divide multiply subtract"
+    "digits digits digits add"
+    "digits digits digits add"
+    "digits digits digits equals"
+    "digits digits digits equals";
+  flex: 5;
+}
+
+.number-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-area: digits;
+  grid-template-areas:
+    "seven eight nine"
+    "four five six"
+    "one two three"
+    "zero zero decimal";
+}
+
+.zero-button {grid-area: zero}
+.one-button {grid-area: one}
+.two-button {grid-area: two}
+.three-button {grid-area: three}
+.four-button {grid-area: four}
+.five-button {grid-area: five}
+.six-button {grid-area: six}
+.seven-button {grid-area: seven}
+.eight-button {grid-area: eight}
+.nine-button {grid-area: nine}
+.clear-button {grid-area: clear}
+.divide-button {grid-area: divide}
+.multiply-button {grid-area: multiply}
+.subtract-button {grid-area: subtract}
+.add-button {grid-area: add}
+.equals-button {grid-area: equals}
