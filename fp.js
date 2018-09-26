@@ -1,7 +1,7 @@
 // functional programming functions
 // curry :: ((a, b, ...) -> c) -> a -> b -> ... -> c
 // courtesy of the mostly-adequate-guide
-const curry = (fn) => {
+export const curry = (fn) => {
   const arity = fn.length;
 
   return function $curry(...args) {
