@@ -24,7 +24,8 @@ const Calculator = {
     FIRST: 0,
     OPERATOR: 1,
     SECOND: 2,
-    EQUALS: 3, 
+    EQUALS: 3,
+    ERROR: 4,
   },
   
   // initialize state
@@ -34,15 +35,25 @@ const Calculator = {
     this.displayElement = element.getElementsByClassName("display")[0];
     this.wireAllButtons();
     this.state = this.STATES.FIRST;
-    this.NUM_STATES = Object.keys(this.STATES).length;
   },
 
   // output property
   set display(output) {
-    this.$display = output;
-    this.displayElement.textContent = output;
+    this.$display = +output;
+    if (this.state != this.STATES.ERROR) {
+      if (this.$display == Infinity || this.$display == -Infinity || isNaN(this.$display)) {
+        this.error = "YOU BROKE IT!";
+        return;
+      }
+      this.displayElement.textContent = this.$display;
+    }
   },
   get display() {return this.$display},
+
+  set error(output) {
+    this.state = this.STATES.ERROR;
+    this.displayElement.textContent = output;
+  },
 
   // state property
   set state(newState) {
@@ -70,21 +81,16 @@ const Calculator = {
       }
     }
     this.$state = newState;
+    console.log(newState);
   },
   get state() {return this.$state;},
 
   // mutators
   operateDisplay: function (operator, y) {
-    this.display = +operator(this.display, y);
+    this.display = operator(this.display, y);
   },
   appendDisplay: function(y) {
     this.operateDisplay(this.append, y)
-  },
-  nextState: function() {
-    this.state = (this.state + 1) % this.NUM_STATES;
-  },
-  prevState: function() {
-    this.state = (this.state - 1) % this.NUM_STATES;
   },
   operate: function(
     operator = this.operator,
@@ -99,8 +105,12 @@ const Calculator = {
     // state changes
     switch(this.state) {
       case this.STATES.OPERATOR:
+        this.state = this.STATES.SECOND;
+        break;
+      case this.STATES.ERROR:
       case this.STATES.EQUALS:
-        this.nextState();
+        this.state = this.STATES.FIRST;
+        break;
     }
     // perform operations
     this.appendDisplay(y);
@@ -108,10 +118,15 @@ const Calculator = {
   operatorButton: function(operator) {
     // state changes
     switch(this.state) {
+      case this.STATES.FIRST:
+      case this.STATES.EQUALS:
+        this.state = this.STATES.OPERATOR;
+        break;
       case this.STATES.SECOND:
         this.equalsButton();
+        this.state = this.STATES.OPERATOR;
+        break;
     }
-    this.state = this.STATES.OPERATOR
     // perform operations
     this.operator = operator;
   },
