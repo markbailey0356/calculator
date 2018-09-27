@@ -1,25 +1,49 @@
+"use strict";
+
 const Calculator = {
   // constants
-  BUTTON_MAP: new Map([
-    ["zero-button", function(){this.digitButton(0)}],
-    ["one-button", function(){this.digitButton(1)}],
-    ["two-button", function(){this.digitButton(2)}],
-    ["three-button", function(){this.digitButton(3)}],
-    ["four-button", function(){this.digitButton(4)}],
-    ["five-button", function(){this.digitButton(5)}],
-    ["six-button", function(){this.digitButton(6)}],
-    ["seven-button", function(){this.digitButton(7)}],
-    ["eight-button", function(){this.digitButton(8)}],
-    ["nine-button", function(){this.digitButton(9)}],
-    ["decimal-button", function(){this.digitButton(".")}],
-    ["add-button", function(){this.operatorButton(this.add)}],
-    ["subtract-button", function(){this.operatorButton(this.subtract)}],
-    ["multiply-button", function(){this.operatorButton(this.multiply)}],
-    ["divide-button", function(){this.operatorButton(this.divide)}],
-    ["equals-button", function(){this.equalsButton()}],
-    ["clear-button", function(){this.clearButton()}],
-    ["clear-entry-button", function(){this.clearEntryButton()}],
-  ]),
+  ZERO: function(){this.digitButton(0)},
+  ONE: function(){this.digitButton(1)},
+  TWO: function(){this.digitButton(2)},
+  THREE: function(){this.digitButton(3)},
+  FOUR: function(){this.digitButton(4)},
+  FIVE: function(){this.digitButton(5)},
+  SIX: function(){this.digitButton(6)},
+  SEVEN: function(){this.digitButton(7)},
+  EIGHT: function(){this.digitButton(8)},
+  NINE: function(){this.digitButton(9)},
+  DECIMAL: function(){this.digitButton(".")},
+  ADD: function(){this.operatorButton(this.add)},
+  SUBTRACT: function(){this.operatorButton(this.subtract)},
+  MULTIPLY: function(){this.operatorButton(this.multiply)},
+  DIVIDE: function(){this.operatorButton(this.divide)},
+  EQUALS: function(){this.equalsButton()},
+  CLEAR: function(){this.clearButton()},
+  CLEAR_ENTRY: function(){this.clearEntryButton()},
+
+  get FUNCTION_MAP() {
+    return this.$FUNCTION_MAP || 
+      (this.$FUNCTION_MAP = [
+        {callback: this.ZERO, class: "zero-button", key: "0"},
+        {callback: this.ONE, class: "one-button", key: "1"},
+        {callback: this.TWO, class: "two-button", key: "2"},
+        {callback: this.THREE, class: "three-button", key: "3"},
+        {callback: this.FOUR, class: "four-button", key: "4"},
+        {callback: this.FIVE, class: "five-button", key: "5"},
+        {callback: this.SIX, class: "six-button", key: "6"},
+        {callback: this.SEVEN, class: "seven-button", key: "7"},
+        {callback: this.EIGHT, class: "eight-button", key: "8"},
+        {callback: this.NINE, class: "nine-button", key: "9"},
+        {callback: this.DECIMAL, class: "decimal-button", key: "."},
+        {callback: this.ADD, class: "add-button", key: "+"},
+        {callback: this.SUBTRACT, class: "subtract-button", key: "-"},
+        {callback: this.MULTIPLY, class: "multiply-button", key: "*"},
+        {callback: this.DIVIDE, class: "divide-button", key: "/"},
+        {callback: this.EQUALS, class: "equals-button", key: "Enter"},
+        {callback: this.CLEAR, class: "clear-button", key: "Delete"},
+        {callback: this.CLEAR_ENTRY, class: "clear-entry-button", key: "Backspace"},
+      ]);
+  },
 
   STATES: {
     FIRST: 0,
@@ -29,7 +53,13 @@ const Calculator = {
     ERROR: 4,
   },
 
-  MAX_DISPLAY_LENGTH: 16,
+  MAX_DISPLAY_LENGTH: 15,
+  VALID_NUMBER_REGEX: /-?(0($|\.\d*)|[1-9]\d*(\.\d*)?)/,
+
+  // calculated properties
+  get maxDisplayNumber() {
+    return Math.pow(10, this.MAX_DISPLAY_LENGTH)-1;
+  },
   
   // initialize state
   init: function(element) {
@@ -37,15 +67,15 @@ const Calculator = {
     this.buttons = element.getElementsByTagName("button");
     this.displayElement = element.getElementsByClassName("display")[0];
     this.wireAllButtons();
+    this.wireKeyboard();
     this.state = this.STATES.FIRST;
-    this.maxDisplayNumber = Math.pow(10, this.MAX_DISPLAY_LENGTH)-1;
   },
 
   // output property
   set display(output) {
     output += '';
-    output = output.match(/0($|\.\d*)|[1-9]\d*(\.\d*)?/)[0];
-    output = output.slice(0,this.MAX_DISPLAY_LENGTH);
+    output = output.match(this.VALID_NUMBER_REGEX)[0];
+    output = output.slice(0, this.MAX_DISPLAY_LENGTH + (output.slice(0,1) == '-'));
     this.$display = output;
     if (this.state != this.STATES.ERROR) {
       this.displayElement.textContent = this.$display;
@@ -157,7 +187,7 @@ const Calculator = {
     this.firstArg = this.operate();
     if (this.firstArg == Infinity || this.firstArg == -Infinity) {
       this.error = "YOU BROKE IT!"
-    } else if (this.firstArg >= this.maxDisplayNumber) {
+    } else if (Math.abs(this.firstArg) > this.maxDisplayNumber) {
       this.error = "OVERFLOW";
     } else {
       this.display = this.firstArg;
@@ -183,8 +213,13 @@ const Calculator = {
     let classList = Array.from(document.getElementsByClassName(className));
     classList.forEach((button) => this.wireButton(button, callback.bind(this)));
   },
-  wireAllButtons: function(map = this.BUTTON_MAP) {
-    map.forEach((callback, className) => this.wireButtonClass(className, callback.bind(this)));
+  wireAllButtons: function(map = this.FUNCTION_MAP) {
+    map.forEach((entry) => this.wireButtonClass(entry.class, entry.callback.bind(this)));
+  },
+  wireKeyboard: function(map = this.FUNCTION_MAP) {
+    window.addEventListener("keydown", (event) => {
+      map.find(entry => entry.key == event.key).callback.bind(this)();
+    });
   },
   
   // pure functions
