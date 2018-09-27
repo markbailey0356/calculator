@@ -3,6 +3,7 @@
 * {
   font-size: 10.5vmin;
   font-family: 'Share Tech Mono', monospace;
+  border-radius: 0px;
 }
 
 html, body {
@@ -19,6 +20,17 @@ html, body {
   flex-direction: column;
   align-items: stretch;
   margin: 0 auto;
+  background-color: #bbb;
+}
+
+button {
+  margin-right: 1vmin;
+  margin-bottom: 1vmin;
+}
+
+.buttons-container {
+  margin-left: 1vmin;
+  margin-top: 1vmin;
 }
 
 .display-frame {
@@ -35,7 +47,7 @@ html, body {
   margin-right: 0.5em;
 }
 
-.buttons {
+.buttons-container {
   display: grid;
   grid-template-columns: repeat(4,1fr);
   grid-template-rows: repeat(5,1fr);
