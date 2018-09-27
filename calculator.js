@@ -17,6 +17,7 @@ const Calculator = {
     ["divide-button", function(){this.operatorButton(this.divide)}],
     ["equals-button", function(){this.equalsButton()}],
     ["clear-button", function(){this.clearButton()}],
+    ["clear-entry-button", function(){this.clearEntryButton()}],
   ]),
 
   STATES: {
@@ -100,6 +101,9 @@ const Calculator = {
     this.display = this.secondArg = this.firstArg = 0;
     this.operator = this.add;
   },
+  clearDisplay: function() {
+    this.display = 0;
+  },
 
   // button functions
   digitButton: function(y) {
@@ -146,6 +150,13 @@ const Calculator = {
   clearButton: function() {
     this.state = this.STATES.FIRST;
     this.clearAll();
+  },
+  clearEntryButton: function() {
+    switch(this.state) {
+      case this.STATES.FIRST:
+      case this.STATES.SECOND:
+        this.clearDisplay();
+    }
   },
 
   // wire event listeners
