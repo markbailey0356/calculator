@@ -1,5 +1,3 @@
-import {curry} from './fp.js';
-
 const Calculator = {
   // constants
   BUTTON_MAP: new Map([
