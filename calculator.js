@@ -18,6 +18,7 @@ const Calculator = {
     ["multiply-button", function(){this.operatorButton(this.multiply)}],
     ["divide-button", function(){this.operatorButton(this.divide)}],
     ["equals-button", function(){this.equalsButton()}],
+    ["clear-button", function(){this.clearButton()}],
   ]),
 
   STATES: {
@@ -71,8 +72,7 @@ const Calculator = {
       // on enter state
       switch(newState) {
         case this.STATES.FIRST:
-          this.display = this.secondArg = this.firstArg = 0;
-          this.operator = this.add;
+          this.clearAll();
           break;
         case this.STATES.SECOND:
           this.display = this.secondArg = 0;
@@ -81,7 +81,6 @@ const Calculator = {
       }
     }
     this.$state = newState;
-    console.log(newState);
   },
   get state() {return this.$state;},
 
@@ -98,6 +97,10 @@ const Calculator = {
     y = this.secondArg
   ) {
     return operator(x, y);
+  },
+  clearAll: function() {
+    this.display = this.secondArg = this.firstArg = 0;
+    this.operator = this.add;
   },
 
   // button functions
@@ -141,6 +144,10 @@ const Calculator = {
     }
     // perform operations
     this.firstArg = this.display = this.operate();
+  },
+  clearButton: function() {
+    this.state = this.STATES.FIRST;
+    this.clearAll();
   },
 
   // wire event listeners
