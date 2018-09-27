@@ -218,7 +218,11 @@ const Calculator = {
   },
   wireKeyboard: function(map = this.FUNCTION_MAP) {
     window.addEventListener("keydown", (event) => {
-      map.find(entry => entry.key == event.key).callback.bind(this)();
+      let keyBindEntry = map.find(entry => entry.key == event.key)
+      if (keyBindEntry) {
+        event.preventDefault();
+        keyBindEntry.callback.bind(this)();
+      }
     });
   },
   
