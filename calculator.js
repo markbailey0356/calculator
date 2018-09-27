@@ -13,7 +13,10 @@ const Calculator = {
     ["seven-button", function(){this.digitButton(7)}],
     ["eight-button", function(){this.digitButton(8)}],
     ["nine-button", function(){this.digitButton(9)}],
-    ["add-button", function(){this.addButton()}],
+    ["add-button", function(){this.operatorButton(this.add)}],
+    ["subtract-button", function(){this.operatorButton(this.subtract)}],
+    ["multiply-button", function(){this.operatorButton(this.multiply)}],
+    ["divide-button", function(){this.operatorButton(this.divide)}],
     ["equals-button", function(){this.equalsButton()}],
   ]),
 
@@ -102,7 +105,7 @@ const Calculator = {
     // perform operations
     this.appendDisplay(y);
   },
-  addButton: function() {
+  operatorButton: function(operator) {
     // state changes
     switch(this.state) {
       case this.STATES.SECOND:
@@ -110,7 +113,7 @@ const Calculator = {
     }
     this.state = this.STATES.OPERATOR
     // perform operations
-    this.operator = this.add;
+    this.operator = operator;
   },
   equalsButton: function() {
     switch(this.state) {
