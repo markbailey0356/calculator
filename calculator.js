@@ -11,6 +11,7 @@ const Calculator = {
     ["seven-button", function(){this.digitButton(7)}],
     ["eight-button", function(){this.digitButton(8)}],
     ["nine-button", function(){this.digitButton(9)}],
+    ["decimal-button", function(){this.digitButton(".")}],
     ["add-button", function(){this.operatorButton(this.add)}],
     ["subtract-button", function(){this.operatorButton(this.subtract)}],
     ["multiply-button", function(){this.operatorButton(this.multiply)}],
@@ -27,6 +28,8 @@ const Calculator = {
     EQUALS: 3,
     ERROR: 4,
   },
+
+  MAX_DISPLAY_LENGTH: 16,
   
   // initialize state
   init: function(element) {
@@ -35,16 +38,16 @@ const Calculator = {
     this.displayElement = element.getElementsByClassName("display")[0];
     this.wireAllButtons();
     this.state = this.STATES.FIRST;
+    this.maxDisplayNumber = Math.pow(10, this.MAX_DISPLAY_LENGTH)-1;
   },
 
   // output property
   set display(output) {
-    this.$display = +output;
+    output += '';
+    output = output.match(/0($|\.\d*)|[1-9]\d*(\.\d*)?/)[0];
+    output = output.slice(0,this.MAX_DISPLAY_LENGTH);
+    this.$display = output;
     if (this.state != this.STATES.ERROR) {
-      if (this.$display == Infinity || this.$display == -Infinity || isNaN(this.$display)) {
-        this.error = "YOU BROKE IT!";
-        return;
-      }
       this.displayElement.textContent = this.$display;
     }
   },
@@ -61,10 +64,10 @@ const Calculator = {
       // on exit state
       switch(this.$state) {
         case this.STATES.FIRST:
-          this.firstArg = this.display;
+          this.firstArg = +this.display;
           break;
         case this.STATES.SECOND:
-          this.secondArg = this.display;
+          this.secondArg = +this.display;
           break;
       }
 
@@ -75,6 +78,7 @@ const Calculator = {
           break;
         case this.STATES.SECOND:
           this.display = this.secondArg = 0;
+          this.decimal = false;
           break;
         
       }
@@ -100,6 +104,7 @@ const Calculator = {
   clearAll: function() {
     this.display = this.secondArg = this.firstArg = 0;
     this.operator = this.add;
+    this.decimal = false;
   },
   clearDisplay: function() {
     this.display = 0;
@@ -118,6 +123,10 @@ const Calculator = {
         break;
     }
     // perform operations
+    if (y == '.') {
+      if (this.decimal) return;
+      else this.decimal = true;
+    }
     this.appendDisplay(y);
   },
   operatorButton: function(operator) {
@@ -145,7 +154,14 @@ const Calculator = {
         break;
     }
     // perform operations
-    this.firstArg = this.display = this.operate();
+    this.firstArg = this.operate();
+    if (this.firstArg == Infinity || this.firstArg == -Infinity) {
+      this.error = "YOU BROKE IT!"
+    } else if (this.firstArg >= this.maxDisplayNumber) {
+      this.error = "OVERFLOW";
+    } else {
+      this.display = this.firstArg;
+    }
   },
   clearButton: function() {
     this.state = this.STATES.FIRST;
